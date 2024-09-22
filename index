@@ -4,107 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Sender Distribution Calculator</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #45a049;
-            --accent-color: #FFA500;
-            --background-color: #f4f4f4;
-            --text-color: #333;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .logo {
-            width: 100px;
-            height: 100px;
-            background-color: var(--accent-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            color: white;
-            font-weight: bold;
-        }
-        h1, h2 {
-            color: var(--primary-color);
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            color: var(--text-color);
-        }
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: var(--secondary-color);
-        }
-        #results, #delaySettings, #instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e9e9e9;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        .language-selector {
-            margin-bottom: 20px;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Your Name's WhatsApp Sender</h1>
-            <div class="logo">LOGO</div>
+            <div class="logo"><img src="images/logo.png" alt="Logo"></div>
         </header>
         
         <div class="language-selector">
@@ -199,77 +106,6 @@
             </ol>
         </div>
     </div>
-    <script>
-        function changeLanguage() {
-            const lang = document.getElementById('language').value;
-            document.querySelectorAll('.lang-en, .lang-ar').forEach(el => {
-                el.style.display = 'none';
-            });
-            document.querySelectorAll('.lang-' + lang).forEach(el => {
-                el.style.display = '';
-            });
-        }
-
-        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const totalNumbers = parseInt(document.getElementById('totalNumbers').value);
-            const channels = parseInt(document.getElementById('channels').value);
-            const minDelay = parseInt(document.getElementById('minDelay').value);
-            const maxDelay = parseInt(document.getElementById('maxDelay').value);
-            const batchSize = parseInt(document.getElementById('batchSize').value);
-            const batchMinDelay = parseInt(document.getElementById('batchMinDelay').value);
-            const batchMaxDelay = parseInt(document.getElementById('batchMaxDelay').value);
-            
-            const numbersPerChannel = Math.floor(totalNumbers / channels);
-            const remainingNumbers = totalNumbers % channels;
-            
-            const lang = document.getElementById('language').value;
-            let results = `<h2>${lang === 'en' ? 'Distribution Results:' : 'نتائج التوزيع:'}</h2>`;
-            results += `<p>${lang === 'en' ? 'Numbers per channel:' : 'الأرقام لكل قناة:'} ${numbersPerChannel}</p>`;
-            if (remainingNumbers > 0) {
-                results += `<p>${lang === 'en' ? 'Remaining numbers:' : 'الأرقام المتبقية:'} ${remainingNumbers} (${lang === 'en' ? 'distribute manually' : 'وزع يدويًا'})</p>`;
-            }
-            
-            const avgDelay = (minDelay + maxDelay) / 2;
-            const avgBatchDelay = (batchMinDelay + batchMaxDelay) / 2;
-            const totalTime = (numbersPerChannel * avgDelay + Math.floor(numbersPerChannel / batchSize) * avgBatchDelay) / 60; // in minutes
-            
-            results += `<p>${lang === 'en' ? 'Estimated time per channel:' : 'الوقت المقدر لكل قناة:'} ${totalTime.toFixed(2)} ${lang === 'en' ? 'minutes' : 'دقيقة'}</p>`;
-            
-            document.getElementById('results').innerHTML = results;
-            
-            // Update delay settings display
-            document.getElementById('batchDelayDisplay').textContent = `${batchMinDelay} to ${batchMaxDelay}`;
-            document.getElementById('batchSizeDisplay').textContent = batchSize;
-            document.getElementById('messageDelayDisplay').textContent = `${minDelay} to ${maxDelay}`;
-            document.getElementById('batchDelayDisplayAr').textContent = `${batchMinDelay} إلى ${batchMaxDelay}`;
-            document.getElementById('batchSizeDisplayAr').textContent = batchSize;
-            document.getElementById('messageDelayDisplayAr').textContent = `${minDelay} إلى ${maxDelay}`;
-            
-            // Create a bar chart
-            const ctx = document.getElementById('distributionChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Array.from({length: channels}, (_, i) => `${lang === 'en' ? 'Channel' : 'قناة'} ${i+1}`),
-                    datasets: [{
-                        label: lang === 'en' ? 'Numbers per Channel' : 'الأرقام لكل قناة',
-                        data: Array(channels).fill(numbersPerChannel),
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
